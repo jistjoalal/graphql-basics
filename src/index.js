@@ -57,6 +57,7 @@ const typeDefs = `
     name: String!
     email: String!
     age: Int
+    posts: [Post!]!
   }
 
   type Post {
@@ -71,16 +72,16 @@ const typeDefs = `
 // resolvers
 const resolvers = {
   Query: {
-    users(_, args) {
-      const query = args.query.toLowerCase()
+    users(_, { query }) {
       if (!query) return USERS
+      query = query.toLowerCase()
       return USERS.filter(({ name }) =>
         name.toLowerCase().includes(query)
       );
     },
-    posts(_, args) {
-      const query = args.query.toLowerCase()
+    posts(_, { query }) {
       if (!query) return POSTS
+      query = query.toLowerCase()
       return POSTS.filter(({ title, body }) =>
         (
           title.toLowerCase().includes(query)
@@ -108,6 +109,13 @@ const resolvers = {
     author(parent) {
       return USERS.find(({ id }) => 
         id === parent.author
+      )
+    }
+  },
+  User: {
+    posts(parent) {
+      return POSTS.filter(({ author }) =>
+        author == parent.id
       )
     }
   }
