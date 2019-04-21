@@ -25,18 +25,21 @@ const POSTS = [
     title: 'a post',
     body: 'the best post',
     published: true,
+    author: '1',
   },
   {
     id: '2',
     title: 'a cool post',
     body: 'the coolest post',
     published: true,
+    author: '1',
   },
   {
     id: '3',
     title: 'a bad post',
     body: 'the worst post',
     published: false,
+    author: '3',
   }
 ]
 
@@ -61,6 +64,7 @@ const typeDefs = `
     title: String!
     body: String!
     published: Boolean!
+    author: User!
   }
 `;
 
@@ -100,6 +104,13 @@ const resolvers = {
       }
     }
   },
+  Post: {
+    author(parent) {
+      return USERS.find(({ id }) => 
+        id === parent.author
+      )
+    }
+  }
 };
 
 const server = new GraphQLServer({
