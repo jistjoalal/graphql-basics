@@ -1,4 +1,5 @@
 import { GraphQLServer } from 'graphql-yoga'
+import uuidv4 from 'uuid/v4';
 
 // demo data
 const USERS = [
@@ -79,6 +80,10 @@ const typeDefs = `
     post: Post!
   }
 
+  type Mutation {
+    createUser(name: String!, email: String!, age: Int): User!
+  }
+
   type User {
     id: ID!
     name: String!
@@ -146,6 +151,24 @@ const resolvers = {
         body: 'step 1 wear a top hat like Abe Lincoln',
         published: true,
       }
+    }
+  },
+  Mutation: {
+    createUser(_, args) {
+      const emailTaken = USERS.some(({ email }) =>
+        email == args.email
+      )
+      if (emailTaken) {
+        throw new Error('Email taken.')
+      }
+      const user = {
+        id: uuidv4(),
+        name: args.name,
+        email: args.email,
+        age: args.age,
+      }
+      USERS.push(user);
+      return user;
     }
   },
   Post: {
