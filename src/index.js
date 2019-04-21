@@ -1,4 +1,4 @@
-import { GraphQLServer } from 'graphql-yoga';
+import { GraphQLServer } from 'graphql-yoga'
 
 // Scalar types:
 // - String, Boolean, Int, Float, ID
@@ -7,6 +7,8 @@ import { GraphQLServer } from 'graphql-yoga';
 // type defs
 const typeDefs = `
   type Query {
+    greeting(name: String, position: String): String!
+    add(a: Float, b: Float): Float!
     me: User!
     post: Post!
   }
@@ -29,6 +31,12 @@ const typeDefs = `
 // resolvers
 const resolvers = {
   Query: {
+    greeting(parent, args) {
+      return 'hello ' + args.name + ' you are the best ' + args.position
+    },
+    add(_, args) {
+      return args.a + args.b
+    },
     me() {
       return {
         id: '123',
@@ -51,6 +59,7 @@ const server = new GraphQLServer({
   typeDefs,
   resolvers,
 })
+
 server.start(() => {
   console.log('server running')
 })
