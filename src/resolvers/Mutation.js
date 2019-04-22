@@ -39,6 +39,27 @@ export default {
     db.comments = db.comments.filter(({ author }) => author != args.id)
     return deletedUsers[0]
   },
+  updateUser(_, args, { db }) {
+    const { data } = args
+    const user = db.users.find(({ id }) => id == args.id)
+    if (!user) {
+      throw new Error('User not found.')
+    }
+    if (typeof data.email == 'string') {
+      const emailTaken = db.users.some(({ email }) => data.email == email)
+      if (emailTaken) {
+        throw new Error('Email in use.')
+      }
+      user.email = data.email
+    }
+    if (typeof data.name == 'string') {
+      user.name = data.name
+    }
+    if (typeof data.age != 'undefined') {
+      user.age = data.age
+    }
+    return user
+  },
   createPost(_, args, { db }) {
     const userExists = db.users.some(({ id }) =>
       id == args.data.author
