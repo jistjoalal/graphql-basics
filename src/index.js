@@ -81,9 +81,28 @@ const typeDefs = `
   }
 
   type Mutation {
-    createUser(name: String!, email: String!, age: Int): User!
-    createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
-    createComment(text: String!, author: ID!, post: ID!): Comment!
+    createUser(data: CreateUserInput!): User!
+    createPost(data: CreatePostInput!): Post!
+    createComment(data: CreateCommentInput!): Comment!
+  }
+
+  input CreateUserInput {
+    name: String!
+    email: String!
+    age: Int
+  }
+
+  input CreatePostInput {
+    title: String!
+    body: String!
+    published: Boolean!
+    author: ID!
+  }
+
+  input CreateCommentInput {
+    text: String!
+    author: ID!
+    post: ID!
   }
 
   type User {
@@ -158,44 +177,44 @@ const resolvers = {
   Mutation: {
     createUser(_, args) {
       const emailTaken = USERS.some(({ email }) =>
-        email == args.email
+        email == args.data.email
       )
       if (emailTaken) {
         throw new Error('Email taken.')
       }
       const user = {
         id: uuidv4(),
-        ...args,
+        ...args.data,
       }
       USERS.push(user);
       return user;
     },
     createPost(_, args) {
       const userExists = USERS.some(({ id }) =>
-        id == args.author
+        id == args.data.author
       )
       if (!userExists) {
         throw new Error('User not found.')
       }
       const post = {
         id: uuidv4(),
-        ...args,
+        ...args.data,
       }
       POSTS.push(post);
       return post;
     },
     createComment(_, args) {
-      const userExists = USERS.some(({ id }) => id == args.author)
+      const userExists = USERS.some(({ id }) => id == args.data.author)
       if (!userExists) {
         throw new Error('User not found.')
       }
-      const post = POSTS.find(({ id }) => id == args.post)
+      const post = POSTS.find(({ id }) => id == args.data.post)
       if (!post || !post.published) {
         throw new Error('Post not found.')
       }
       const comment = {
         id: uuidv4(),
-        ...args,
+        ...args.data,
       }
       COMMENTS.push(comment)
       return comment
