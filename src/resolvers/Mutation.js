@@ -102,7 +102,7 @@ export default {
     }
     return post
   },
-  createComment(_, args, { db }) {
+  createComment(_, args, { db, pubsub }) {
     const userExists = db.users.some(({ id }) => id == args.data.author)
     if (!userExists) {
       throw new Error('User not found.')
@@ -116,6 +116,7 @@ export default {
       ...args.data,
     }
     db.comments.push(comment)
+    pubsub.publish(`comment ${args.data.post}`, { comment })
     return comment
   },
   deleteComment(_, args, { db }) {
