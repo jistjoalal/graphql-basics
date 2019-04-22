@@ -85,6 +85,23 @@ export default {
     db.comments = db.comments.filter(({ post }) => post != args.id)
     return deletedPosts[0]
   },
+  updatePost(_, args, { db }) {
+    const { data } = args
+    const post = db.posts.find(({ id }) => id == args.id)
+    if (!post) {
+      throw new Error('Post not found.')
+    }
+    if (typeof data.title == 'string') {
+      post.title = data.title
+    }
+    if (typeof data.body == 'string') {
+      post.body = data.body
+    }
+    if (typeof data.published == 'boolean') {
+      post.published = data.published
+    }
+    return post
+  },
   createComment(_, args, { db }) {
     const userExists = db.users.some(({ id }) => id == args.data.author)
     if (!userExists) {
@@ -110,4 +127,15 @@ export default {
     const deletedComments = db.comments.splice(commentIdx, 1)
     return deletedComments[0]
   },
+  updateComment(_, args, { db }) {
+    const { data } = args
+    const comment = db.comments.find(({ id }) => id == args.id)
+    if (!comment) {
+      throw new Error('Comment not found.')
+    }
+    if (typeof data.text == 'string') {
+      comment.text = data.text
+    }
+    return comment
+  }
 }
